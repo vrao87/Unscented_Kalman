@@ -103,9 +103,9 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
     // Initialize covariance matrix. Variance of x and y from laser is used as initial values
     P_ <<    1, 0, 0, 0, 0,
              0, 1, 0, 0, 0,
-             0,    0, 1, 0, 0,
-             0,    0, 0, 1, 0,
-             0,    0, 0, 0, 1;
+             0, 0, 1, 0, 0,
+             0, 0, 0, 1, 0,
+             0, 0, 0, 0, 1;
 
     // Initialize timestamp
     previous_timestamp_ = meas_package.timestamp_;
@@ -124,8 +124,8 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
       float rho_dot =  meas_package.raw_measurements_[2]; // velocity of rho
 
       // Coordinates convertion from polar to cartesian
-      float x = rho * cos(phi); 
-      float y = rho * sin(phi);
+      x_(0) = rho * cos(phi); 
+      x_(1) = rho * sin(phi);
 
     }
     is_initialized_ = true;
@@ -353,7 +353,7 @@ void UKF::UpdateLidar(MeasurementPackage meas_package) {
   //add measurement noise covariance matrix
   MatrixXd R = MatrixXd(n_z, n_z);
   R <<  std_laspx_*std_laspx_, 0,
-        0, std_laspy_*std_laspy_,       
+        0, std_laspy_*std_laspy_;   
 
   S = S + R;
 
