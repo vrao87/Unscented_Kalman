@@ -1,4 +1,4 @@
-# Install script for directory: /Users/vrao_87/Documents/Projects/Term2/UnscentedKF/GitProject/Unscented_Kalman
+# Install script for directory: /Users/vrao_87/Documents/Projects/Term2/UnscentedKF/GitProject_New/Unscented_Kalman_Filter
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -35,5 +35,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/Users/vrao_87/Documents/Projects/Term2/UnscentedKF/GitProject/Unscented_Kalman/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/Users/vrao_87/Documents/Projects/Term2/UnscentedKF/GitProject_New/Unscented_Kalman_Filter/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
