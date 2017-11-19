@@ -133,23 +133,27 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
     return;
   }
 
-   
   /*****************************************************************************
     *  Prediction
   ****************************************************************************/
     //compute the time elapsed between the current and previous measurements
     float dt = (meas_package.timestamp_ - previous_timestamp_) / 1000000.0;  //Convert to seconds
+    previous_timestamp_ = meas_package.timestamp_;
+
     Prediction(dt);
 
   /*****************************************************************************
     *  Update
   ****************************************************************************/
-    if (meas_package.sensor_type_ == MeasurementPackage::LASER) {
+    if (meas_package.sensor_type_ == MeasurementPackage::LASER && use_laser_) {
       UpdateLidar(meas_package);
     }
-    else if (meas_package.sensor_type_ == MeasurementPackage::RADAR) {
+    else if (meas_package.sensor_type_ == MeasurementPackage::RADAR && use_radar_) {
       UpdateRadar(meas_package);
     }
+
+    std::cout<< "Covariance: "<< P_ << std::endl;
+    std::cout<< "Mean: "<< x_ << std::endl;
 }
 
 /**
@@ -164,6 +168,7 @@ void UKF::Prediction(double delta_t) {
   Complete this function! Estimate the object's location. Modify the state
   vector, x_. Predict sigma points, the state, and the state covariance matrix.
   */
+
 /***************************** Generate Sigma Points *******************************************/
 
   //create sigma point matrix
@@ -221,8 +226,10 @@ void UKF::Prediction(double delta_t) {
     Xsig_aug.col(i + 1 + n_aug_) = x_aug - sqrt(lambda_ + n_aug_) * L.col(i);
   }
 
-
  /***************************** Predict Sigma Points *******************************************/
+
+  Xsig_pred_.fill(0.0);
+
   //predict sigma points
   for (int i = 0; i < 2 * n_aug_ + 1; i++)
   {
@@ -268,12 +275,12 @@ void UKF::Prediction(double delta_t) {
     Xsig_pred_(4, i) = yawd_p;
   }
 
-
  /********************* Convert Predicted Sigma Points to Mean/Covariance **********************/
   // set weights
+
   double weight_0 = lambda_ / (lambda_ + n_aug_);
   weights_(0) = weight_0;
-  for (int i = 1; i < 2 * n_aug_ + 1; i++) {  //2n+1 weights
+  for (int i = 1; i < n_sig_; i++) {  //2n+1 weights
     double weight = 0.5 / (n_aug_ + lambda_);
     weights_(i) = weight;
   }
@@ -286,7 +293,7 @@ void UKF::Prediction(double delta_t) {
 
   //predicted state covariance matrix
   P_.fill(0.0); 
-  for (int i = 0; i < 2 * n_aug_ + 1; i++) {  //iterate over sigma points
+  for (int i = 0; i < n_sig_; i++) {  //iterate over sigma points
 
     // state difference
     VectorXd x_diff = Xsig_pred_.col(i) - x_;
@@ -388,6 +395,7 @@ void UKF::UpdateLidar(MeasurementPackage meas_package) {
 
   //calculate NIS
   NIS_laser_ = z_diff.transpose() * S.inverse() * z_diff;
+
 }
 
 /**
@@ -403,7 +411,6 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
 
   You'll also need to calculate the radar NIS.
   */
-
 
 /********************** Transform predicted sigma points in measurement space ********************/
   //set measurement dimension, radar can measure r, phi, and r_dot
