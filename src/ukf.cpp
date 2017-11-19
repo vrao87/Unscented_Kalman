@@ -26,10 +26,10 @@ UKF::UKF() {
   P_ = MatrixXd(5, 5);
 
   // Process noise standard deviation longitudinal acceleration in m/s^2
-  std_a_ = 30;
+  std_a_ = 2;
 
   // Process noise standard deviation yaw acceleration in rad/s^2
-  std_yawdd_ = 30;
+  std_yawdd_ = 0.35;
 
   // Laser measurement noise standard deviation position1 in m
   std_laspx_ = 0.15;
@@ -98,14 +98,14 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
   if (!is_initialized_) {
 
     // Initialize state
-    x_ << 1, 1, 1, 1, 1;
+    x_ << 0, 0, 0, 0, 0;
    
     // Initialize covariance matrix. Variance of x and y from laser is used as initial values
-    P_ <<    1, 0, 0, 0, 0,
-             0, 1, 0, 0, 0,
-             0, 0, 1, 0, 0,
-             0, 0, 0, 1, 0,
-             0, 0, 0, 0, 1;
+    P_ <<    0.15, 0, 0, 0, 0,
+             0, 0.15, 0, 0, 0,
+             0, 0, 0.5, 0, 0,
+             0, 0, 0, 0.5, 0,
+             0, 0, 0, 0, 0.5;
 
     // Initialize timestamp
     previous_timestamp_ = meas_package.timestamp_;
@@ -121,7 +121,6 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
       */
       float rho     =  meas_package.raw_measurements_[0]; // range
       float phi     =  meas_package.raw_measurements_[1]; // bearing
-      float rho_dot =  meas_package.raw_measurements_[2]; // velocity of rho
 
       // Coordinates convertion from polar to cartesian
       x_(0) = rho * cos(phi); 
